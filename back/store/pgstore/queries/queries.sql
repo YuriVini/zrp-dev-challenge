@@ -4,6 +4,12 @@ SELECT
 FROM users
 WHERE id = $1;
 
+-- name: GetUserByEmail :one
+SELECT 
+    "id", "name", "email"
+FROM users
+WHERE email = $1;
+
 -- name: InsertUser :one
 INSERT INTO users 
     ("name", "email", "password") VALUES
