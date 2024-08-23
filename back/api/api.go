@@ -2,13 +2,17 @@ package api
 
 import (
 	"back/store/pgstore"
+	"back/token"
 	"encoding/json"
+	"errors"
 	"log/slog"
 	"net/http"
 
 	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/cors"
+	"github.com/google/uuid"
+	"github.com/jackc/pgx"
 )
 
 type apiHandler struct {
@@ -38,6 +42,8 @@ func NewHandler(q *pgstore.Queries) http.Handler {
 	}))
 
 	r.Route("/api", func(r chi.Router) {
+		r.Post("/login", a.authenticate)
+
 		r.Route("/user", func(r chi.Router) {
 			r.Post("/", a.createUser)
 		})
@@ -91,3 +97,59 @@ func (h apiHandler) createUser(w http.ResponseWriter, r *http.Request) {
 
 	http.Error(w, "Email already in use", http.StatusConflict)
 }
+
+func (h apiHandler) authenticate(w http.ResponseWriter, r *http.Request) {
+	type _body struct {
+		Email    string `json:"email"`
+		Password string `json:"password"`
+	}
+	var body _body
+
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		http.Error(w, "Invalid json", http.StatusBadRequest)
+		return
+	}
+
+	user, err := h.q.GetUserByEmail(r.Context(), body.Email)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			http.Error(w, "User not found", http.StatusBadRequest)
+			return
+		}
+
+		http.Error(w, "Something went wrong", http.StatusInternalServerError)
+		return
+	}
+
+	if body.Password == user.Password {
+		type LoginResponse struct {
+			Token  string `json:"token"`
+			UserID string `json:"user_id"`
+		}
+
+		tokenString, err := token.CreateToken(body.Email)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+		}
+
+		data, err := json.Marshal(LoginResponse{Token: tokenString, UserID: user.ID.String()})
+		if err != nil {
+			slog.Error("Failed to Marshal", "error", err)
+			http.Error(w, "Something went wrong", http.StatusInternalServerError)
+			return
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		_, err = w.Write(data)
+		if err != nil {
+			slog.Error("Failed to Write", "error", err)
+			http.Error(w, "Something went wrong", http.StatusInternalServerError)
+			return
+		}
+
+		return
+	} else {
+		http.Error(w, "Invalid credentials", http.StatusUnauthorized)
+	}
+}
+
