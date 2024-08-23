@@ -46,6 +46,8 @@ func NewHandler(q *pgstore.Queries) http.Handler {
 
 		r.Route("/user", func(r chi.Router) {
 			r.Post("/", a.createUser)
+
+			r.Get("/{user_id}", a.getUser)
 		})
 	})
 
@@ -153,3 +155,49 @@ func (h apiHandler) authenticate(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func (h apiHandler) getUser(w http.ResponseWriter, r *http.Request) {
+	type GetUserResponse struct {
+		Name  string `json:"name"`
+		Email string `json:"email"`
+	}
+
+	err := token.ProtectedHandler(w, r)
+	if err != nil {
+		return
+	}
+
+	rawUserID := chi.URLParam(r, "user_id")
+	userID, err := uuid.Parse(rawUserID)
+	if err != nil {
+		http.Error(w, "Invalid user ID", http.StatusBadRequest)
+		return
+	}
+
+	user, err := h.q.GetUser(r.Context(), userID)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			http.Error(w, "Room not found", http.StatusBadRequest)
+			return
+		}
+
+		http.Error(w, "Something went wrong", http.StatusInternalServerError)
+		return
+	}
+
+	data, err := json.Marshal(GetUserResponse{Name: user.Name, Email: user.Email})
+	if err != nil {
+		slog.Error("Failed to Marshal", "error", err)
+		http.Error(w, "Something went wrong", http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	_, err = w.Write(data)
+	if err != nil {
+		slog.Error("Failed to Write", "error", err)
+		http.Error(w, "Something went wrong", http.StatusInternalServerError)
+		return
+	}
+
+	slog.Info("Encontrei", "user: ", user)
+}
