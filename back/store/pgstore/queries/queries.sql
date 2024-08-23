@@ -6,7 +6,7 @@ WHERE id = $1;
 
 -- name: GetUserByEmail :one
 SELECT 
-    "id", "name", "email"
+    "id", "name", "email", "password"
 FROM users
 WHERE email = $1;
 
