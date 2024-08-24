@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { HeroeForm } from "../../components/hero-form";
 import { Modal } from "../../components/modal";
+import Navbar from "../../components/nav-bar";
 
 const heroesData = [
   {
@@ -35,8 +36,8 @@ export const Heroes = () => {
 
   return (
     <div className="p-4">
-      <h1>Heroes Page</h1>
-      <div className="flex justify-end mb-6">
+      <Navbar />
+      <div className="flex justify-end mb-6 mt-16">
         <button
           type="button"
           onClick={() => setVisible(true)}
