@@ -3,10 +3,21 @@ import "leaflet/dist/leaflet.css";
 import { Marker, Popup, TileLayer, MapContainer } from "react-leaflet";
 import { useOccurrenceWebsocket } from "../hooks/useOccurrencesWebsocket";
 import { useThreats } from "../zustand-states/useThreats";
+import { Icon } from "leaflet";
+
+import flame from "/flame.png";
 
 export const GlobalMap = () => {
   const { threats } = useThreats();
   useOccurrenceWebsocket();
+
+  const threatIcon = new Icon({
+    iconUrl: flame,
+    iconSize: [40, 60],
+    iconAnchor: [20, 40],
+    popupAnchor: [0, -40],
+    className: "custom-icon",
+  });
 
   return (
     <div className="h-full w-full">
@@ -16,7 +27,11 @@ export const GlobalMap = () => {
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
         {threats?.map((threat, index) => (
-          <Marker key={index} position={[threat?.location[0]?.lat, threat?.location[0]?.lng]}>
+          <Marker
+            key={index}
+            icon={threatIcon}
+            position={[threat?.location[0]?.lat, threat?.location[0]?.lng]}
+          >
             <Popup>
               <div>
                 <img src={threat?.monster?.url} />
