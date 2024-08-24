@@ -3,6 +3,7 @@ import { create } from 'zustand'
 type DangerLevel = "God" | "Dragon" | "Tiger" | "Wolf"
 
 interface Threat {
+  id: string;
   location: [{
     lat: number
     lng: number

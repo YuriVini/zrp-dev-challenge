@@ -1,9 +1,10 @@
-import { useEffect } from "react";
+import { useEffect, useId } from "react";
 import { io } from "socket.io-client";
 import { useThreats } from "../zustand-states/useThreats";
 
 
 export const useOccurrenceWebsocket = () => {
+  const newId = useId()
   const { addThreat } = useThreats()
 
   useEffect(() => {
@@ -12,7 +13,7 @@ export const useOccurrenceWebsocket = () => {
     ws.on("connect", () => console.log("Connected"))
 
     ws.on("occurrence", event => {
-      addThreat(event)
+      addThreat({ id: newId, ...event })
     })
 
     return () => {
