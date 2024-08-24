@@ -8,6 +8,13 @@ import (
 	"github.com/google/uuid"
 )
 
+type Hero struct {
+	ID   uuid.UUID `db:"id" json:"id"`
+	Name string `db:"name" json:"name"`
+	Rank string `db:"rank" json:"rank"`
+	ImageUrl  string `db:"image_url" json:"image_url"`
+}
+
 type User struct {
 	ID       uuid.UUID  `db:"id" json:"id"`
 	Name     string 	`db:"name" json:"name"`

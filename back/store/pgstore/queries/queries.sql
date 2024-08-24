@@ -15,3 +15,14 @@ INSERT INTO users
     ("name", "email", "password") VALUES
     ($1, $2, $3)
 RETURNING "id";
+
+-- name: InsertHero :one
+INSERT INTO heroes 
+    ("name", "rank", "image_url") VALUES
+    ($1, $2, $3)
+RETURNING "id";
+
+-- name: GetHeroes :many
+SELECT 
+    "id", "name", "rank", "image_url"
+FROM heroes;

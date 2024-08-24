@@ -11,6 +11,37 @@ import (
 	"github.com/google/uuid"
 )
 
+const getHeroes = `-- name: GetHeroes :many
+SELECT 
+    "id", "name", "rank", "image_url"
+FROM heroes
+`
+
+func (q *Queries) GetHeroes(ctx context.Context) ([]Hero, error) {
+	rows, err := q.db.Query(ctx, getHeroes)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Hero
+	for rows.Next() {
+		var i Hero
+		if err := rows.Scan(
+			&i.ID,
+			&i.Name,
+			&i.Rank,
+			&i.ImageUrl,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getUser = `-- name: GetUser :one
 SELECT 
     "id", "name", "email"
@@ -48,6 +79,26 @@ func (q *Queries) GetUserByEmail(ctx context.Context, email string) (User, error
 		&i.Password,
 	)
 	return i, err
+}
+
+const insertHero = `-- name: InsertHero :one
+INSERT INTO heroes 
+    ("name", "rank", "image_url") VALUES
+    ($1, $2, $3)
+RETURNING "id"
+`
+
+type InsertHeroParams struct {
+	Name     string
+	Rank     string
+	ImageUrl string
+}
+
+func (q *Queries) InsertHero(ctx context.Context, arg InsertHeroParams) (uuid.UUID, error) {
+	row := q.db.QueryRow(ctx, insertHero, arg.Name, arg.Rank, arg.ImageUrl)
+	var id uuid.UUID
+	err := row.Scan(&id)
+	return id, err
 }
 
 const insertUser = `-- name: InsertUser :one
