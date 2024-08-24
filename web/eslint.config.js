@@ -32,6 +32,10 @@ export default tseslint.config(
       "@typescript-eslint/no-misused-promises": "off",
       "@typescript-eslint/no-unsafe-argument": "off",
       "react-hooks/exhaustive-deps": "off",
+      "@typescript-eslint/no-unsafe-return": "off",
+      "@typescript-eslint/no-unsafe-call": "off",
+      "@typescript-eslint/no-unsafe-member-access": "off",
+      "@typescript-eslint/no-unsafe-assignment": "off",
       'react-refresh/only-export-components': [
         'warn',
         { allowConstantExport: true },
