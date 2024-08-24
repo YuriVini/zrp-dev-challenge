@@ -19,7 +19,7 @@ export type ControlledInputProps<T extends FieldValues> = {
   formatter?: (value: number | string) => string;
 } & Omit<React.InputHTMLAttributes<HTMLInputElement>, "children">;
 
-const InputBase: React.FC<InputProps> = ({ label, errorMessage, ...rest }) => {
+const InputBase: React.FC<InputProps> = ({ label, errorMessage, ...rest }: InputProps) => {
   return (
     <>
       <div className="border-b">
