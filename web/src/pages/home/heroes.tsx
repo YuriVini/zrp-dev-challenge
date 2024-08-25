@@ -1,5 +1,5 @@
 import { Suspense, useState } from "react";
-import { HeroeForm } from "../../components/hero-form";
+import { HeroForm } from "../../components/hero-form";
 import { Modal } from "../../components/modal";
 import Navbar from "../../components/nav-bar";
 import { useHeroes } from "../../service/home/heroes.service";
@@ -8,6 +8,10 @@ export const Heroes = () => {
   const [visible, setVisible] = useState(false);
 
   const { data: heroes } = useHeroes();
+
+  const submitAction = () => {
+    setVisible(false);
+  };
 
   return (
     <div className="p-4">
@@ -23,7 +27,7 @@ export const Heroes = () => {
       </div>
 
       <Modal visible={visible} onClose={() => setVisible(false)}>
-        <HeroeForm />
+        <HeroForm submitAction={submitAction} />
       </Modal>
 
       <Suspense fallback={<>Carregando...</>}>

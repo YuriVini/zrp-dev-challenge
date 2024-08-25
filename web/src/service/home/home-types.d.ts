@@ -6,3 +6,5 @@ export interface HeroesResponse {
   rank: string;
   image_url: string;
 }
+
+export type CreateHeroRequest = Omit<HeroesResponse, "id">
