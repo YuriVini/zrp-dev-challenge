@@ -3,6 +3,7 @@ import { HeroForm } from "../../components/hero-form";
 import { Modal } from "../../components/modal";
 import Navbar from "../../components/nav-bar";
 import { useHeroes } from "../../service/home/heroes.service";
+import { Hero } from "../../components/hero";
 
 export const Heroes = () => {
   const [visible, setVisible] = useState(false);
@@ -32,21 +33,7 @@ export const Heroes = () => {
 
       <Suspense fallback={<>Carregando...</>}>
         <div className="flex flex-wrap items-center justify-center sm:justify-normal gap-6">
-          {heroes?.map((hero) => (
-            <div key={hero?.id} className="my-2 flex flex-col items-center gap-2">
-              <div className="p-0.5 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 rounded-full">
-                <img
-                  src={hero?.image_url}
-                  alt={hero?.name}
-                  className="w-24 h-24 object-cover rounded-full "
-                />
-              </div>
-              <div className="ml-4">
-                <h3>Nome: {hero?.name}</h3>
-                <p>Rank: {hero?.rank}</p>
-              </div>
-            </div>
-          ))}
+          {heroes?.map((hero) => <Hero hero={hero} key={hero?.id} />)}
         </div>
       </Suspense>
     </div>
