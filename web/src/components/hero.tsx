@@ -5,7 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { useQueryClient } from "@tanstack/react-query";
-import { heroesKey } from "../service/home/heroes.service";
+import { heroesKey, useDeleteHero, useUpdateHero } from "../service/home/heroes.service";
 
 interface HeroProps {
   hero: HomeApi.HeroesResponse;
@@ -31,17 +31,31 @@ export const Hero = ({ hero }: HeroProps) => {
 
   const queryClient = useQueryClient();
 
+  const { mutate: mutateUpdate } = useUpdateHero();
+  const { mutate: mutateDelete } = useDeleteHero();
+
   const onDelete = () => {
-    queryClient.setQueryData<HomeApi.HeroesResponse[]>(heroesKey(), (state) =>
-      state?.filter((item) => item?.id !== hero?.id)
-    );
+    mutateDelete(hero?.id, {
+      onSuccess: () => {
+        queryClient.setQueryData<HomeApi.HeroesResponse[]>(heroesKey(), (state) =>
+          state?.filter((item) => item?.id !== hero?.id)
+        );
+      },
+    });
   };
 
   const onUpdate = handleSubmit((data: z.TypeOf<typeof schema>) => {
-    queryClient.setQueryData<HomeApi.HeroesResponse[]>(heroesKey(), (state) =>
-      state?.map((item) =>
-        item?.id === hero?.id ? { ...item, ...data, rank: selectedRank } : item
-      )
+    mutateUpdate(
+      { heroId: hero?.id, hero: { rank: selectedRank, ...data } },
+      {
+        onSuccess: () => {
+          queryClient.setQueryData<HomeApi.HeroesResponse[]>(heroesKey(), (state) =>
+            state?.map((item) =>
+              item?.id === hero?.id ? { ...item, ...data, rank: selectedRank } : item
+            )
+          );
+        },
+      }
     );
 
     setVisible(false);

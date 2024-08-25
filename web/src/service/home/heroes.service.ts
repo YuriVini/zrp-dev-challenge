@@ -16,3 +16,15 @@ export const useCreateHero = () => {
     mutationFn: (data: HomeApi.CreateHeroRequest) => api.post("/heroes/create", data).then(res => res.data),
   });
 };
+
+export const useUpdateHero = () => {
+  return useMutation({
+    mutationFn: (data: { heroId: string, hero: HomeApi.CreateHeroRequest }) => api.patch(`/heroes/${data?.heroId}`, data?.hero).then(res => res.data),
+  });
+};
+
+export const useDeleteHero = () => {
+  return useMutation({
+    mutationFn: (heroId: string) => api.delete(`/heroes/${heroId}`).then(res => res.data),
+  });
+};
