@@ -120,3 +120,45 @@ func (q *Queries) InsertUser(ctx context.Context, arg InsertUserParams) (uuid.UU
 	err := row.Scan(&id)
 	return id, err
 }
+
+const updateHero = `-- name: UpdateHero :one
+UPDATE heroes
+SET
+    name = $2,
+    image_url = $3,
+    rank = $4
+WHERE
+    id = $1
+RETURNING id, name, image_url, rank
+`
+
+type UpdateHeroParams struct {
+	ID       uuid.UUID
+	Name     string
+	ImageUrl string
+	Rank     string
+}
+
+type UpdateHeroRow struct {
+	ID       uuid.UUID
+	Name     string
+	ImageUrl string
+	Rank     string
+}
+
+func (q *Queries) UpdateHero(ctx context.Context, arg UpdateHeroParams) (UpdateHeroRow, error) {
+	row := q.db.QueryRow(ctx, updateHero,
+		arg.ID,
+		arg.Name,
+		arg.ImageUrl,
+		arg.Rank,
+	)
+	var i UpdateHeroRow
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.ImageUrl,
+		&i.Rank,
+	)
+	return i, err
+}

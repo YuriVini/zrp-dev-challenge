@@ -26,3 +26,13 @@ RETURNING "id";
 SELECT 
     "id", "name", "rank", "image_url"
 FROM heroes;
+
+-- name: UpdateHero :one
+UPDATE heroes
+SET
+    name = $2,
+    image_url = $3,
+    rank = $4
+WHERE
+    id = $1
+RETURNING id, name, image_url, rank;

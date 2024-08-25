@@ -52,6 +52,10 @@ func NewHandler(q *pgstore.Queries) http.Handler {
 		r.Route("/heroes", func(r chi.Router) {
 			r.Get("/", a.getHeroes)
 			r.Post("/create", a.createHero)
+
+			r.Route("/{hero_id}", func(r chi.Router) {
+				r.Patch("/", a.updateHero)
+			})
 		})
 	})
 
@@ -267,6 +271,57 @@ func (h apiHandler) getHeroes(w http.ResponseWriter, r *http.Request) {
 	}
 
 	data, err := json.Marshal(heroes)
+	if err != nil {
+		slog.Error("Failed to Marshal", "error", err)
+		http.Error(w, "Something went wrong", http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	_, err = w.Write(data)
+	if err != nil {
+		slog.Error("Failed to Write", "error", err)
+		http.Error(w, "Something went wrong", http.StatusInternalServerError)
+		return
+	}
+}
+func (h apiHandler) updateHero(w http.ResponseWriter, r *http.Request) {
+	err := token.ProtectedHandler(w, r)
+	if err != nil {
+		return
+	}
+
+	rawHeroID := chi.URLParam(r, "hero_id")
+	heroID, err := uuid.Parse(rawHeroID)
+	if err != nil {
+		http.Error(w, "Invalid hero ID", http.StatusBadRequest)
+		return
+	}
+
+	type _body struct {
+		Name     string `json:"name"`
+		Rank     string `json:"rank"`
+		ImageUrl string `json:"image_url"`
+	}
+
+	var body _body
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		http.Error(w, "Invalid json", http.StatusBadRequest)
+		return
+	}
+
+	heroes, err := h.q.UpdateHero(r.Context(), pgstore.UpdateHeroParams{ID: heroID, Name: body.Name, Rank: body.Rank, ImageUrl: body.ImageUrl})
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			http.Error(w, "Hero not found", http.StatusBadRequest)
+			return
+		}
+
+		http.Error(w, "Something went wrong", http.StatusInternalServerError)
+		return
+	}
+
+	data, err := json.Marshal(pgstore.Hero{ID: heroes.ID, Name: heroes.Name, Rank: heroes.Rank, ImageUrl: heroes.ImageUrl})
 	if err != nil {
 		slog.Error("Failed to Marshal", "error", err)
 		http.Error(w, "Something went wrong", http.StatusInternalServerError)
