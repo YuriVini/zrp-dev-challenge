@@ -20,8 +20,9 @@ api.interceptors.request.use((instanceConfig) => {
   try {
     const token = localStorage.getItem("authToken");
 
+    console.log("asdadasdad", token);
     if (token && newInstance.headers) {
-      newInstance.headers.Authorization = token;
+      newInstance.headers.Authorization = `Bearer ${token}`;
     }
   } catch {
     console.log("Failed requesting")
