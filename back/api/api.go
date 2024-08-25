@@ -55,6 +55,7 @@ func NewHandler(q *pgstore.Queries) http.Handler {
 
 			r.Route("/{hero_id}", func(r chi.Router) {
 				r.Patch("/", a.updateHero)
+				r.Delete("/", a.deleteHero)
 			})
 		})
 	})
@@ -285,6 +286,7 @@ func (h apiHandler) getHeroes(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 }
+
 func (h apiHandler) updateHero(w http.ResponseWriter, r *http.Request) {
 	err := token.ProtectedHandler(w, r)
 	if err != nil {
@@ -322,6 +324,50 @@ func (h apiHandler) updateHero(w http.ResponseWriter, r *http.Request) {
 	}
 
 	data, err := json.Marshal(pgstore.Hero{ID: heroes.ID, Name: heroes.Name, Rank: heroes.Rank, ImageUrl: heroes.ImageUrl})
+	if err != nil {
+		slog.Error("Failed to Marshal", "error", err)
+		http.Error(w, "Something went wrong", http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	_, err = w.Write(data)
+	if err != nil {
+		slog.Error("Failed to Write", "error", err)
+		http.Error(w, "Something went wrong", http.StatusInternalServerError)
+		return
+	}
+}
+
+func (h apiHandler) deleteHero(w http.ResponseWriter, r *http.Request) {
+	err := token.ProtectedHandler(w, r)
+	if err != nil {
+		return
+	}
+
+	rawHeroID := chi.URLParam(r, "hero_id")
+	heroID, err := uuid.Parse(rawHeroID)
+	if err != nil {
+		http.Error(w, "Invalid hero ID", http.StatusBadRequest)
+		return
+	}
+
+	err = h.q.DeleteHero(r.Context(), heroID)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			http.Error(w, "Heroes not found", http.StatusBadRequest)
+			return
+		}
+
+		http.Error(w, "Something went wrong", http.StatusInternalServerError)
+		return
+	}
+
+	type DeleteHeroResponse struct {
+		Message string `json:"message"`
+	}
+
+	data, err := json.Marshal(DeleteHeroResponse{Message: "Herói excluído!"})
 	if err != nil {
 		slog.Error("Failed to Marshal", "error", err)
 		http.Error(w, "Something went wrong", http.StatusInternalServerError)

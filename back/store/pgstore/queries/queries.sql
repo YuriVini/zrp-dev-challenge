@@ -36,3 +36,7 @@ SET
 WHERE
     id = $1
 RETURNING id, name, image_url, rank;
+
+-- name: DeleteHero :exec
+DELETE FROM heroes
+WHERE id = $1;
