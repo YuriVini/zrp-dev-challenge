@@ -46,11 +46,11 @@ func NewHandler(q *pgstore.Queries) http.Handler {
 		r.Post("/register", a.createUser)
 
 		r.Route("/user", func(r chi.Router) {
-
 			r.Get("/{user_id}", a.getUser)
 		})
 
 		r.Route("/heroes", func(r chi.Router) {
+			r.Get("/", a.getHeroes)
 			r.Post("/", a.createHero)
 		})
 	})
@@ -229,8 +229,6 @@ func (h apiHandler) createHero(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	slog.Info("Heroes insertted", "id: ", heroID)
-
 	type CreateHeroResponse struct {
 		ID string `json:"id"`
 	}
@@ -251,4 +249,35 @@ func (h apiHandler) createHero(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func (h apiHandler) getHeroes(w http.ResponseWriter, r *http.Request) {
+	err := token.ProtectedHandler(w, r)
+	if err != nil {
+		return
+	}
+
+	heroes, err := h.q.GetHeroes(r.Context())
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			http.Error(w, "Heroes not found", http.StatusBadRequest)
+			return
+		}
+
+		http.Error(w, "Something went wrong", http.StatusInternalServerError)
+		return
+	}
+
+	data, err := json.Marshal(heroes)
+	if err != nil {
+		slog.Error("Failed to Marshal", "error", err)
+		http.Error(w, "Something went wrong", http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	_, err = w.Write(data)
+	if err != nil {
+		slog.Error("Failed to Write", "error", err)
+		http.Error(w, "Something went wrong", http.StatusInternalServerError)
+		return
+	}
 }
