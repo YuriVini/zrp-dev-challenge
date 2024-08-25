@@ -51,7 +51,7 @@ func NewHandler(q *pgstore.Queries) http.Handler {
 
 		r.Route("/heroes", func(r chi.Router) {
 			r.Get("/", a.getHeroes)
-			r.Post("/", a.createHero)
+			r.Post("/create", a.createHero)
 		})
 	})
 
