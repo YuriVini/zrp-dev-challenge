@@ -34,7 +34,7 @@ export const GlobalMap = () => {
           >
             <Popup>
               <div>
-                <img src={threat?.monster?.url} />
+                <img src={threat?.monster?.url} alt={threat?.monsterName} />
                 <p className="font-bold text-lg">{threat?.monsterName}</p>
                 <p>{threat?.monster?.description}</p>
               </div>

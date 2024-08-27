@@ -42,9 +42,12 @@ export const Hero = ({ hero }: HeroProps) => {
         );
       },
     });
+    setVisible(false);
+    setShowUpdateForm(false);
   };
 
   const onUpdate = handleSubmit((data: z.TypeOf<typeof schema>) => {
+    if (selectedRank === "") return alert("Selectione um Rank");
     mutateUpdate(
       { heroId: hero?.id, hero: { rank: selectedRank, ...data } },
       {
@@ -82,7 +85,7 @@ export const Hero = ({ hero }: HeroProps) => {
         <div className="max-w-[650px] bg-zinc-800 flex flex-col items-center gap-10 py-10 px-16 rounded">
           <img
             src={hero?.image_url}
-            alt={hero?.name}
+            alt={`${hero?.name} Modal`}
             className="w-24 h-24 object-cover rounded-full"
           />
           <p>{hero?.name}</p>
@@ -98,6 +101,7 @@ export const Hero = ({ hero }: HeroProps) => {
                   className="bg-black px-2"
                   onChange={(e) => setSelectedRank(e.target.value)}
                 >
+                  <option value="">--Selectione um rank--</option>
                   <option value="S" className="bg-black">
                     Rank S
                   </option>

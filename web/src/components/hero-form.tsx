@@ -30,6 +30,7 @@ export const HeroForm = ({ submitAction }: HeroFormProps) => {
   const { mutate } = useCreateHero();
 
   const onSubmit = handleSubmit((data: z.TypeOf<typeof schema>) => {
+    if (selectedRank === "") return alert("Selectione um Rank");
     mutate(
       { rank: selectedRank, ...data },
       {
@@ -50,22 +51,24 @@ export const HeroForm = ({ submitAction }: HeroFormProps) => {
         <Input name="name" placeholder="Nome do Herói" type="text" control={control} />
         <Input name="image_url" type="text" placeholder="URL da Imagem" control={control} />
         <label className="flex flex-row gap-2 mt-4">
-          Rank do Herói
+          Rank do Herói{""}
           <select
+            id="rank-select"
             value={selectedRank}
             className="bg-black px-2"
             onChange={(e) => setSelectedRank(e.target.value)}
           >
-            <option value="s" className="bg-black">
+            <option value="">--Selectione um rank--</option>
+            <option value="S" className="bg-black">
               Rank S
             </option>
-            <option value="a" className="bg-black">
+            <option value="A" className="bg-black">
               Rank A
             </option>
-            <option value="b" className="bg-black">
+            <option value="B" className="bg-black">
               Rank B
             </option>
-            <option value="c" className="bg-black">
+            <option value="C" className="bg-black">
               Rank C
             </option>
           </select>
