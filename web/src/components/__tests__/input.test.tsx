@@ -3,6 +3,7 @@ import { Input } from "../input";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { act } from "react";
 
 const schema = z.object({
   test: z.string().min(1, { message: "Campo obrigatório" }),
@@ -45,14 +46,15 @@ test("should render error text", () => {
 
   const input = screen.getByPlaceholderText("Test");
 
-  fireEvent.input(input, {
-    target: {
-      value: "test",
-    },
+  act(() => {
+    fireEvent.input(input, {
+      target: {
+        value: "test",
+      },
+    });
+
+    result.current?.setError("test", { message: "Erro" });
   });
-
-  result.current?.setError("test", { message: "Erro" });
-
   const errorText = screen.getByPlaceholderText("Test");
   expect(errorText).toBeTruthy();
   expect(input.getAttribute("value")).toBe("test");

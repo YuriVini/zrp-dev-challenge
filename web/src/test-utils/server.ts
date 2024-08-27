@@ -1,6 +1,8 @@
 import { setupServer } from 'msw/node'
 
 import { http, HttpResponse } from 'msw';
+import { defaultMockHero } from './mock-data';
+
 
 export const handlers = [
   http.post("*/heroes/create", () => {
@@ -11,6 +13,9 @@ export const handlers = [
       image_url: "https://google.com",
 
     }, { status: 200 });
+  }),
+  http.get("*/heroes", () => {
+    return HttpResponse.json(defaultMockHero, { status: 200 });
   }),
   http.patch("*/heroes/:hero_id", () => {
     return HttpResponse.json({ id: "123" }, { status: 200 })
