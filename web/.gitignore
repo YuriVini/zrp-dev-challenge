@@ -24,3 +24,7 @@ yarn.lock
 *.njsproj
 *.sln
 *.sw?
+
+# Test files
+coverage
+vite.config.ts.*
