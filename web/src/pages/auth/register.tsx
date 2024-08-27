@@ -65,7 +65,7 @@ export const Register = () => {
           />
           <Input
             required
-            label="Senha"
+            label="Confirmar Senha"
             type="password"
             control={control}
             autoComplete="off"

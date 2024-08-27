@@ -22,7 +22,13 @@ export const handlers = [
   }),
   http.delete("*/heroes/:hero_id", () => {
     return HttpResponse.json({}, { status: 200 })
-  })
+  }),
+  http.post("*/login", () => {
+    return HttpResponse.json({ user_id: "123", token: "321" }, { status: 200 });
+  }),
+  http.post("*/register", () => {
+    return HttpResponse.json({}, { status: 200 });
+  }),
 ];
 
 export const server = setupServer(...handlers)
