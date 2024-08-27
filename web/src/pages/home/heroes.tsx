@@ -2,13 +2,13 @@ import { Suspense, useState } from "react";
 import { HeroForm } from "../../components/hero-form";
 import { Modal } from "../../components/modal";
 import Navbar from "../../components/nav-bar";
-import { useHeroes } from "../../service/home/heroes.service";
+import { useGetHeroes } from "../../service/home/heroes.service";
 import { Hero } from "../../components/hero";
 
 export const Heroes = () => {
   const [visible, setVisible] = useState(false);
 
-  const { data: heroes } = useHeroes();
+  const { data: heroes } = useGetHeroes();
 
   const submitAction = () => {
     setVisible(false);

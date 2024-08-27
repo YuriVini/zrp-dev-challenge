@@ -4,7 +4,7 @@ import { api } from "../axios";
 
 export const heroesKey = (): QueryKey => ["heroes-list"]
 
-export const useHeroes = () => {
+export const useGetHeroes = () => {
   return useSuspenseQuery<HomeApi.HeroesResponse[]>({
     queryFn: () => api.get("/heroes").then(res => res.data),
     queryKey: heroesKey(),
