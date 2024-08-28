@@ -26,9 +26,11 @@ export default defineConfig({
         "./**/setup-tests.{js,ts}",
         "**/*.test.{ts,tsx}",
         "./__mocks__/*.js",
-        "./**/*.enum.{js,ts,jsx,tsx}"]
+        "./src/routes-path.tsx",
+        "./**/*.enum.{js,ts,jsx,tsx}"
+      ]
     },
-    include: ['**/*.test.tsx'],
+    include: ['**/*.test.tsx', './src/tools/*.test.ts'],
     globals: true,
     environment: 'jsdom',
     setupFiles: ['./vitest.setup.ts'],

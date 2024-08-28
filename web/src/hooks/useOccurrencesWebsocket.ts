@@ -3,7 +3,7 @@ import { io } from "socket.io-client";
 import { Threat, useThreats } from "../zustand-states/useThreats";
 import { BATTLE_STATUS, useBattles } from "../zustand-states/useBattles";
 import { useGetHeroes } from "../service/home/heroes.service";
-import { getRandomNumber } from "../utils";
+import { getRandomNumber } from "../tools";
 import { v4 as uuidv4 } from 'uuid';
 
 

@@ -14,7 +14,7 @@ vi.mock("react-router-dom", async () => {
   };
 });
 
-test("should render screen", async () => {
+test("should render screen and complete login", async () => {
   render(
     <QueryClientProvider client={queryClient}>
       <Login />

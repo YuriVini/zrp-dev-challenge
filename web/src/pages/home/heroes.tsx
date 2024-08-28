@@ -21,9 +21,9 @@ export const Heroes = () => {
         <button
           type="button"
           onClick={() => setVisible(true)}
-          className="bg-red-700 transition-colors hover:bg-red-800 text-white py-2 px-6 rounded-full"
+          className="bg-red-700 transition-colors hover:bg-red-800 text-white py-2 px-6 rounded-full text-lg font-medium"
         >
-          <p className="text-sm font-medium">Criar Herói</p>
+          Criar Herói
         </button>
       </div>
 
